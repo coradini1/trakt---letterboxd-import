@@ -11,6 +11,8 @@ import getpass
 import csv
 import time
 import os.path
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 import datetime
 
 import urllib
