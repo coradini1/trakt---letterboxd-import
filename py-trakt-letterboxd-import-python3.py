@@ -8,6 +8,8 @@ import time
 import csv
 import time
 import os.path
+import ssl
+ssl._create_default_https_context = ssl._create_unverified_context
 from time import sleep
 
 import urllib
