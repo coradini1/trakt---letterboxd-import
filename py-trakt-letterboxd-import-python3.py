@@ -100,35 +100,33 @@ def authorize(auth_code, grant_type='authorization_code', code=CODE):
         f.close()
 
 
-def get_data_letterboxd(filename,diary=True):
-    #diary true for diary file, false for watched file (no watched date)
+def get_data_letterboxd(filename, diary=True):
     data = []
     with open(filename, 'r', encoding='utf-8') as csvfile:
         letterboxd_data = csv.reader(csvfile, delimiter=',')
-        next(letterboxd_data) #skip header
+        next(letterboxd_data)  # skip header
         for row in letterboxd_data:
-
+            imdbid = None  # Default IMDb ID to None
             if CHECK_IMDB_ID:
                 print('Get imdbID for ' +  row[1] + '(' + row[2] + ')')
                 imdbinfo = get_imdb_info(row[1], year=int(row[2]))
                 print(imdbinfo)
                 if imdbinfo['Response'] != 'False':
                     print("Success!")
+                    imdbid = imdbinfo.get('imdbID', None)
                 else:
                     print("Failed! IMDB ID was not found. Try to add movie to trakt w/o ID.")
-                imdbid = imdbinfo.get('imdbID',None)
-            else:
-                imdbid = None
 
             if diary:
-                data.append([row[1],row[2],row[7]+' 20:15',imdbid,row[4]])
-                print([row[1],row[2],row[7]+' 20:15',imdbid,row[4]])
+                data.append([row[1], row[2], row[0] + ' 20:15', imdbid, row[3] if len(row) >= 4 else ''])
+                print([row[1], row[2], row[0] + ' 20:15', imdbid, row[3] if len(row) >= 4 else ''])
             else:
-                data.append([row[1],row[2],'released',imdbid,None])
-                print([row[1],row[2],'released',imdbid,None])
+                data.append([row[1], row[2], 'released', imdbid, None])
+                print([row[1], row[2], 'released', imdbid, None])
             time.sleep(0.2)
 
     return data
+
 
 def send_data(movie_data, auth_token, diary=True):
     #movie_data = [{'imdb_id':imdb_id,'title':title,'year':year,'last_played': date_played}]
